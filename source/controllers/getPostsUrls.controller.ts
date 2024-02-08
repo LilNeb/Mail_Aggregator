@@ -27,7 +27,7 @@ export async function getPostsUrlsFromCategory(
       throw new Error("Invalid category name");
     }
 
-    const url = `https://substack.com/api/v1/trending?limit=36&category_id=${categoryId}`;
+    const url = `https://substack.com/api/v1/trending?limit=50&category_id=${categoryId}`;
     console.log(url); // Log the final URL
 
     const postsResult = await axios.get(url);
