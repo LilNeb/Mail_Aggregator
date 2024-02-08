@@ -1,11 +1,12 @@
 {
-  "description": "",
-  "dependencies": {
-    "@google-cloud/local-auth": "^3.0.0",
-    "googleapis": "^128.0.0",
-    "html-to-text": "^9.0.5",
-    "imap": "^0.8.19",
-    "imap-simple": "^5.1.0",
-    "mailparser": "^3.6.5"
-  }
+  "name": "mail-aggregator",
+  "version": "1.0.0",
+  "description": "récupérer les catégories : https://substack.com/api/v1/categories",
+  "main": "source/server.ts",
+  "scripts": {
+    "dev": "nodemon source/server.ts",
+    "build": "rm -rf build/ && prettier --write source/ && tsc"
+},
+  "author": "",
+  "license": "ISC"
 }

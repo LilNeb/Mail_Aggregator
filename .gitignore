@@ -1,4 +1,4 @@
 node_modules
-token.json
-gmail_token.json
-credentials.json
+.env
+old/node_modules
+old/package-lock.json
