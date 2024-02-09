@@ -2,9 +2,9 @@
   "name": "mail-aggregator",
   "version": "1.0.0",
   "description": "récupérer les catégories : https://substack.com/api/v1/categories",
-  "main": "source/server.ts",
+  "main": "api/server.ts",
   "scripts": {
-    "dev": "nodemon source/server.ts",
+    "dev": "nodemon api/server.ts",
     "build": "rm -rf build/ && prettier --write source/ && tsc"
 },
   "author": "",
