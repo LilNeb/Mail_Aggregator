@@ -5,7 +5,8 @@
   "main": "./api/server.ts",
   "scripts": {
     "dev": "nodemon -e ts,json --exec ts-node src/server.ts",
-    "build": "rm -rf build/ && prettier --write src/ && tsc"
+    "build": "tsc",
+    "start": "node build/server.js"
   },
   "author": "",
   "license": "ISC",

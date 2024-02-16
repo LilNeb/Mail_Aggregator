@@ -15,7 +15,7 @@ export async function getCategories(
     }, {});
 
     fs.writeFileSync(
-      `${process.env.LOCAL_DATA_PATH}`,
+      `${process.env.CONTAINER_CATEGORIES_FILE_PATH}`,
       JSON.stringify(categories)
     );
 

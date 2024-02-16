@@ -16,7 +16,7 @@ export async function getPostsUrlsFromCategory(
 
     // Read the categories and IDs from the local file
     const categoryData = fs.readFileSync(
-      `${process.env.LOCAL_DATA_PATH}`,
+      `${process.env.CONTAINER_CATEGORIES_FILE_PATH}`,
       "utf8"
     );
     const categoryMap: { [name: string]: { id: string } } =

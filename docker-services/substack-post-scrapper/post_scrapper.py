@@ -7,6 +7,8 @@ import requests
 
 app = Flask(__name__)
 
+SAVE_DIR = os.environ.get('CONTAINER_MARKDOWN_FILES_FOLDER_PATH')
+
 
 def html_to_md(html_content: str) -> str:
     """
@@ -49,6 +51,27 @@ def scrape_post(post_url: str, save_dir: str) -> None:
 
 @app.route('/scrape', methods=['POST'])
 def scrape_and_save():
+    data = request.json
+    if not os.path.exists(SAVE_DIR):
+        os.makedirs(SAVE_DIR)
+
+    for title, info in data.items():
+        url = info.get('url')
+        try:
+            response = requests.get(url)
+            soup = BeautifulSoup(response.content, 'html.parser')
+            content = soup.get_text()
+            # Simplified content extraction for demonstration; customize as needed
+
+            filename = f"{title.replace(' ', '_').lower()}.md"
+            filepath = os.path.join(SAVE_DIR, filename)
+            with open(filepath, 'w', encoding='utf-8') as file:
+                file.write(content)
+        except Exception as e:
+            print(f"Error scraping {url}: {e}")
+            continue
+
+    return jsonify({"message": "Scraping complete", "data": data})
     data = request.json
     urls = data.get('urls')  # Liste d'URLs
     save_dir = data.get('directory', '.')

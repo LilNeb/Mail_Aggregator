@@ -9,12 +9,15 @@ export async function postCategoryPostsToMicroservice(
 ) {
   try {
     const categoryName = req.params.categoryName;
+    const categoryPath = process.env.CONTAINER_CATEGORIES_FILE_PATH;
+    if (!categoryPath) {
+      throw new Error("Invalid category path");
+    }
     console.log(categoryName);
 
-    const categoryData = fs.readFileSync(
-      "local-data/categories-and-id.json",
-      "utf8"
-    );
+    console.log(`Reading from: ${process.env.CONTAINER_CATEGORIES_FILE_PATH}`);
+    const categoryData = fs.readFileSync(categoryPath, "utf8");
+
     const categoryMap: { [name: string]: { id: string } } =
       JSON.parse(categoryData);
 
@@ -38,9 +41,16 @@ export async function postCategoryPostsToMicroservice(
     }, {});
 
     // Envoyer les données au microservice
-    const microserviceUrl = "http://localhost:3000/data"; // Remplacez par l'URL de votre microservice
-    await axios.post(microserviceUrl, formattedData);
-
+    const defaultURL = process.env.MS1_URL
+      ? process.env.MS1_URL
+      : "PROBLEM WITH MS1 URL"; // Remplacez par l'URL de votre microservice
+    console.log(
+      `Sending data to microservice: ${defaultURL} with data: ${JSON.stringify(
+        formattedData
+      )}`
+    );
+    await axios.post(defaultURL, formattedData);
+    defaultURL;
     return res.send(formattedData);
   } catch (error) {
     console.error(error);
