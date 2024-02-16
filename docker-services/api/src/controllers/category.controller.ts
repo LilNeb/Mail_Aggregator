@@ -15,7 +15,7 @@ export async function getCategories(
     }, {});
 
     fs.writeFileSync(
-      "local-data/categories-and-id.json",
+      `${process.env.LOCAL_DATA_PATH}`,
       JSON.stringify(categories)
     );
 

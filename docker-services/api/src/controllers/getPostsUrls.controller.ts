@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import axios from "axios";
 import fs from "fs";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export async function getPostsUrlsFromCategory(
   req: Request,
@@ -13,7 +16,7 @@ export async function getPostsUrlsFromCategory(
 
     // Read the categories and IDs from the local file
     const categoryData = fs.readFileSync(
-      "local-data/categories-and-id.json",
+      `${process.env.LOCAL_DATA_PATH}`,
       "utf8"
     );
     const categoryMap: { [name: string]: { id: string } } =
@@ -31,6 +34,7 @@ export async function getPostsUrlsFromCategory(
     console.log(url); // Log the final URL
 
     const postsResult = await axios.get(url);
+    // console.log(postsResult.data);
 
     const posts = postsResult.data.posts; // Get the "posts" table from the API response
 

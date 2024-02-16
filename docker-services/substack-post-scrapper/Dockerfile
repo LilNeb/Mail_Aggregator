@@ -1,13 +1,17 @@
-FROM node:14
+# Utiliser une image de base Python
+FROM python:3.8-slim
 
+# Définir le répertoire de travail dans le conteneur
 WORKDIR /app
 
-COPY package*.json ./
+# Copier le fichier du script dans le conteneur
+COPY post_scrapper.py /app
 
-RUN npm install
+# Installer Flask et les dépendances nécessaires
+RUN pip install Flask requests beautifulsoup4 html2text
 
-COPY . .
+# Exposer le port sur lequel Flask s'exécute
+EXPOSE 3010
 
-EXPOSE 3000
-
-CMD ["node", "app.js"]
+# Commande pour lancer l'application Flask
+CMD ["python", "post_scrapper.py"]
