@@ -2,6 +2,9 @@ version: '3.8'
 
 services:
   python_scrapper_ms:
+    build: 
+      context: docker-services/substack-post-scrapper
+      dockerfile: Dockerfile
     image: python_scrapper_ms
     volumes:
       - ${LOCAL_DATA_FOLDER_PATH}:/app/data
@@ -12,6 +15,9 @@ services:
       - CONTAINER_MARKDOWN_FILES_FOLDER_PATH=${CONTAINER_MARKDOWN_FILES_FOLDER_PATH}
 
   mail-aggregator-api:
+    build:
+      context: docker-services/api
+      dockerfile: Dockerfile
     image: mail-aggregator-api
     volumes:
       - ${LOCAL_DATA_FOLDER_PATH}:/app/data
