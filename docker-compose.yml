@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  python_scrapper_ms:
+    build: 
+      context: docker-services/substack-post-scrapper
+      dockerfile: Dockerfile
+    image: python_scrapper_ms
+    volumes:
+      - ${PWD}/local-data:/app/data
+      - ${PWD}/local-data/scrapped-posts:${CONTAINER_MARKDOWN_FILES_FOLDER_PATH} 
+    ports:
+      - "${PORT_MS1}:${PORT_MS1}"
+    environment:
+      - CONTAINER_MARKDOWN_FILES_FOLDER_PATH=${CONTAINER_MARKDOWN_FILES_FOLDER_PATH}
+      - PORT_MS1=${PORT_MS1}
+
+  mail-aggregator-api:
+    build:
+      context: docker-services/api
+      dockerfile: Dockerfile
+    image: mail-aggregator-api
+    volumes:
+      - ${PWD}/local-data:/app/data
+    ports:
+      - "${PORT_API}:${PORT_API}"
+    environment:
+      - PORT=${PORT_API}
+      - CONTAINER_CATEGORIES_FILE_PATH=${CONTAINER_CATEGORIES_FILE_PATH}
+      - MS1_URL=${MS1_URL}
+    depends_on:
+      - python_scrapper_ms

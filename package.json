@@ -1,11 +1,5 @@
 {
-  "description": "",
   "dependencies": {
-    "@google-cloud/local-auth": "^3.0.0",
-    "googleapis": "^128.0.0",
-    "html-to-text": "^9.0.5",
-    "imap": "^0.8.19",
-    "imap-simple": "^5.1.0",
-    "mailparser": "^3.6.5"
+    "winston": "^3.11.0"
   }
 }
