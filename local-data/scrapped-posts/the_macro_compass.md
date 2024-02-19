@@ -22,7 +22,7 @@ The Macro Compass
 
 Bubbles & AntiBubbles
 
-236
+239
 
 Share this post
 
@@ -42,7 +42,7 @@ Note
 
 Other
 
-[5](https://themacrocompass.substack.com/p/bubbles-and-antibubbles/comments)[](javascript:void\(0\))
+[11](https://themacrocompass.substack.com/p/bubbles-and-antibubbles/comments)[](javascript:void\(0\))
 
 1×
 
@@ -60,7 +60,7 @@ Narratives can dominate macro longer than you can remain solvent
 
 Feb 11, 2024
 
-236
+239
 
 Share this post
 
@@ -80,7 +80,7 @@ Note
 
 Other
 
-[5](https://themacrocompass.substack.com/p/bubbles-and-antibubbles/comments)
+[11](https://themacrocompass.substack.com/p/bubbles-and-antibubbles/comments)
 
 [Share](javascript:void\(0\))
 
@@ -247,7 +247,7 @@ Note
 
 Other
 
-5 Comments
+11 Comments
 
 ![](https://substackcdn.com/image/fetch/w_64,h_64,c_fill,f_auto,q_auto:good,fl_progressive:steep,g_auto/https%3A%2F%2Fsubstack.com%2Fimg%2Favatars%2Flogged-out.png)
 

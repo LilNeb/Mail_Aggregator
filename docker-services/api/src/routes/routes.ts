@@ -5,11 +5,11 @@ import { postCategoryPostsToMicroservice } from "../controllers/postCategoryPost
 
 const router = express.Router();
 
-router.get("/getCategoriesAndId", getCategories);
-router.get("/getPostsUrlsFromCategory/:categoryName", getPostsUrlsFromCategory);
+router.get("/categories", getCategories);
+router.get("/posts/:categoryName", getPostsUrlsFromCategory);
 
 router.post(
-  "/postUrlsToMicroservice/:categoryName",
+  "/markdown/:categoryName",
   postCategoryPostsToMicroservice
 );
 

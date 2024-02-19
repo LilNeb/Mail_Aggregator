@@ -7,8 +7,8 @@ services:
       dockerfile: Dockerfile
     image: python_scrapper_ms
     volumes:
-      - ${LOCAL_DATA_FOLDER_PATH}:/app/data
-      - ${MARKDOWN_FILES_FOLDER_PATH}:${CONTAINER_MARKDOWN_FILES_FOLDER_PATH} 
+      - ${PWD}/local-data:/app/data
+      - ${PWD}/local-data/scrapped-posts:${CONTAINER_MARKDOWN_FILES_FOLDER_PATH} 
     ports:
       - "${PORT_MS1}:3010"
     environment:
@@ -21,7 +21,7 @@ services:
       dockerfile: Dockerfile
     image: mail-aggregator-api
     volumes:
-      - ${LOCAL_DATA_FOLDER_PATH}:/app/data
+      - ${PWD}/local-data:/app/data
     ports:
       - "${PORT_API}:3000"
     environment:

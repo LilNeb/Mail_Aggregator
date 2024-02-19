@@ -26,7 +26,7 @@ Other
 
 Feb 14, 2024
 
-97
+117
 
 Share this post
 
@@ -46,7 +46,7 @@ Note
 
 Other
 
-[133](https://thepurse.substack.com/p/how-to-save-money-on-childcare/comments)
+[141](https://thepurse.substack.com/p/how-to-save-money-on-childcare/comments)
 
 [Share](javascript:void\(0\))
 
@@ -135,7 +135,7 @@ Lindsey
 
 p.s. I’ll add that [Chamber of Mothers](https://www.chamberofmothers.com/) and [Moms First](https://momsfirst.us/) are amazing organizations that are fighting in Washington for real change for parents. I recommend following their work, donating, and pitching in when you can. If we don’t speak up, things will never change.
 
-97
+117
 
 Share this post
 
@@ -155,7 +155,7 @@ Note
 
 Other
 
-[133](https://thepurse.substack.com/p/how-to-save-money-on-childcare/comments)
+[141](https://thepurse.substack.com/p/how-to-save-money-on-childcare/comments)
 
 [Share](javascript:void\(0\))
 
