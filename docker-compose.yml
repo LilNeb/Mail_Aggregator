@@ -10,7 +10,7 @@ services:
       - ${PWD}/local-data:/app/data
       - ${PWD}/local-data/scrapped-posts:${CONTAINER_MARKDOWN_FILES_FOLDER_PATH} 
     ports:
-      - "${PORT_MS1}:3010"
+      - "${PORT_MS1}:${PORT_MS1}"
     environment:
       - CONTAINER_MARKDOWN_FILES_FOLDER_PATH=${CONTAINER_MARKDOWN_FILES_FOLDER_PATH}
       - PORT_MS1=${PORT_MS1}
@@ -23,7 +23,7 @@ services:
     volumes:
       - ${PWD}/local-data:/app/data
     ports:
-      - "${PORT_API}:3000"
+      - "${PORT_API}:${PORT_API}"
     environment:
       - PORT=${PORT_API}
       - CONTAINER_CATEGORIES_FILE_PATH=${CONTAINER_CATEGORIES_FILE_PATH}
