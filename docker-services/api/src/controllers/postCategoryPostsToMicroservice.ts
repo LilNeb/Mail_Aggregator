@@ -26,14 +26,22 @@ export async function postCategoryPostsToMicroservice(req: Request, res: Respons
             return acc;
         }, {});
 
-        const msUrl = process.env.MS1_URL; // Assurez-vous que cette URL est correctement configurée
+        const msUrl = process.env.MS1_URL;
         if (!msUrl) {
             throw new Error("MS1_URL is not defined");
         }
-        await axios.post(msUrl, formattedData);
+        const dataToSend = {
+            category: categoryName,
+            posts: formattedData
+        };
+
+        // Log the data being sent to the microservice
+        logger.info(`Sending data to microservice: ${JSON.stringify(dataToSend, null, 2)}`);
+
+        await axios.post(msUrl, dataToSend);        
 
         logger.info(`Posts of category: ${categoryName} posted successfully to microservice.`);
-        return res.send(formattedData);
+        return res.send(dataToSend);
     } catch (error) {
         logger.error(`Error posting posts of category: ${categoryName} to microservice`, error);
         return next(error);
