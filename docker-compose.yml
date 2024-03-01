@@ -30,3 +30,18 @@ services:
       - MS1_URL=${MS1_URL}
     depends_on:
       - python_scrapper_ms
+
+  ai_synthetizer_ms:
+    build: 
+      context: docker-services/ai-synthetizer
+      dockerfile: Dockerfile
+    image: ai_synthetizer_ms
+    volumes:
+      - ${PWD}/local-data:/app/data
+      - ${PWD}/local-data/scrapped-posts:${CONTAINER_MARKDOWN_FILES_FOLDER_PATH} 
+    ports:
+      - "${PORT_MS2}:${PORT_MS2}"
+    environment:
+      - CONTAINER_MARKDOWN_FILES_FOLDER_PATH=${CONTAINER_MARKDOWN_FILES_FOLDER_PATH}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PORT_MS2=${PORT_MS2}

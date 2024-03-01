@@ -14,10 +14,11 @@ RUN npm install
 COPY . .
 
 # Compiler le TypeScript en JavaScript
+RUN npm install openai@^4.0.0
 RUN npm run build
 
 # Exposer le port sur lequel l'application s'exécute
-EXPOSE ${PORT}
+EXPOSE ${PORT_MS2}
 
 # Définir la commande pour démarrer l'application
 CMD ["npm", "start"]

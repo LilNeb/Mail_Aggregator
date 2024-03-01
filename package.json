@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "openai": "^4.28.4",
     "winston": "^3.11.0"
   }
 }
