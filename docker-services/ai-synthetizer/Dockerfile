@@ -15,6 +15,7 @@ COPY . .
 
 # Compiler le TypeScript en JavaScript
 RUN npm install openai@^4.0.0
+RUN npm install winston
 RUN npm run build
 
 # Exposer le port sur lequel l'application s'exécute
