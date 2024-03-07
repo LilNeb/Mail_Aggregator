@@ -88,7 +88,7 @@ export const scrapPosts = async (params: { categoryName: string }) => {
 export const summarizePosts = async (params: { categoryName: string, limit:number }) => {
   const { categoryName, limit } = params;
 
-  const summary = await axios.get(SYNTHETIZER_API_URL + "/summarize/" + categoryName + "/" + params.limit);
+  const summary = await axios.get(SYNTHETIZER_API_URL + "/summarize/" + categoryName + "/" + limit);
 
   return summary.data;
 };
