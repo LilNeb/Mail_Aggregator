@@ -2,11 +2,12 @@ import { Request, Response, NextFunction } from "express";
 import axios from "axios";
 import fs from "fs";
 import logger from '../logger'; // Assurez-vous d'avoir un module logger configuré
+import { SUBSTACK_API_URL } from "../constants";
 
 export async function getCategories(req: Request, res: Response, next: NextFunction) {
     logger.info("Fetching categories from Substack API");
     try {
-        const result = await axios.get("https://substack.com/api/v1/categories");
+        const result = await axios.get(SUBSTACK_API_URL+ "/categories");
         const categories = result.data.reduce((acc: any, category: any) => {
             acc[category.slug] = { id: category.id };
             return acc;
