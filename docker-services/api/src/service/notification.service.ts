@@ -16,7 +16,7 @@ export const sendNotification = async (params: {
   const { summary, telegramUrl } = params;
   const message = JSON.stringify(summary, null, 2);
   await axios.get(
-    telegramUrl + "/sendMessage?chat_id=123456789&text=" + message
+    telegramUrl + "&text=" + message
   );
 };
 
