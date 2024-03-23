@@ -129,6 +129,7 @@ export default {
 </script>
 
 <style>
+/* General Styles */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
 body {
@@ -144,6 +145,7 @@ body {
   font-family: 'Roboto', sans-serif;
 }
 
+/* Title Styles */
 .title {
   flex: 0 0 10vh;
   margin: 0;
@@ -153,6 +155,7 @@ body {
   color: #000000;
 }
 
+/* Category Styles */
 .category-text {
   color: rgb(0, 0, 0);
   font-weight: bold;
@@ -182,11 +185,19 @@ body {
   transform: scale(1);
 }
 
-.category-square:hover, .category-square.selected {
+.category-square:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
+
+.category-square.selected {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Submit and Clear Bar Styles */
 .submit-clear-bar {
   flex: 0 0 10vh;
   display: flex;
@@ -197,7 +208,8 @@ body {
   background-color: #f0f0f0;
 }
 
-.submit-action, .clear-action {
+.submit-action,
+.clear-action {
   flex: 1;
   padding: 20px;
   cursor: pointer;
@@ -214,6 +226,7 @@ body {
   background-color: #ba8181;
 }
 
+/* Status Messages Styles */
 .status-messages {
   padding: 20px;
   background-color: #0d0d0d;
@@ -227,23 +240,36 @@ body {
   white-space: pre;
 }
 
+/* Summaries Container Styles */
 .summaries-container {
-  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centre les conteneurs de résumés */
+  margin: 20px auto; /* Centre horizontalement tout le conteneur */
   padding: 10px;
+  max-width: 33.33%; /* Prend 1/3 de la largeur de la page */
   background-color: #f9f9f9;
   border-radius: 5px;
 }
 
+/* Category Heading Styles */
 .category-heading {
   font-size: 24px;
   color: #333;
   margin-top: 20px;
+  width: 100%; /* S'assure que le titre de la catégorie prend toute la largeur */
+  text-align: center; /* Centre le texte du titre */
 }
 
+/* Summary Text Styles */
 .summary-text {
   font-size: 16px;
   line-height: 1.5;
-  text-align: left;
+  text-align: justify; /* Justifie le texte pour un rendu plus propre */
   margin-top: 5px;
+  padding: 10px; /* Ajoute de l'espace autour du texte pour une meilleure lisibilité */
+  background-color: #ffffff; /* Fond blanc pour les paragraphes de résumé */
+  border-left: 3px solid #907f9a; /* Ajoute une bordure gauche pour distinguer les paragraphes */
+  width: 100%; /* Assure que le texte prend toute la largeur du conteneur */
 }
 </style>
