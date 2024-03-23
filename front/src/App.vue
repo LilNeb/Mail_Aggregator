@@ -34,7 +34,8 @@
       <div v-for="(summary, index) in summaries" :key="index">
         <h2 class="category-heading">{{ summary.category }}</h2>
         <div v-for="(text, i) in summary.summaries" :key="`summary-${i}`">
-          <p class="summary-text">{{ text }}</p>
+          <!-- Utilisez v-html pour afficher le HTML généré et appelez renderMarkdown -->
+          <p class="summary-text" v-html="renderMarkdown(text)"></p>
         </div>
       </div>
     </div>
@@ -43,6 +44,7 @@
 
 <script>
 import axios from 'axios';
+import markdownit from 'markdown-it'
 
 export default {
   data() {
@@ -123,6 +125,11 @@ export default {
         [];
         this.summaries = categorySummaries; // Stocke les résumés formatés avec les catégories
       }, 2000);
+    },
+    renderMarkdown(text) {
+      const md = markdownit()
+      console.log(md.render(text));
+      return md.render(text); // Convertissez le Markdown en HTML
     },
   }
 };
