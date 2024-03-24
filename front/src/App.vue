@@ -152,27 +152,4 @@ body {
   color: #000000;
 }
 
-/* Summaries Container Styles */
-
-
-/* Category Heading Styles */
-.category-heading {
-  font-size: 24px;
-  color: #333;
-  margin-top: 20px;
-  width: 100%; /* S'assure que le titre de la catégorie prend toute la largeur */
-  text-align: center; /* Centre le texte du titre */
-}
-
-/* Summary Text Styles */
-.summary-text {
-  font-size: 16px;
-  line-height: 1.5;
-  text-align: justify; /* Justifie le texte pour un rendu plus propre */
-  margin-top: 5px;
-  padding: 10px; /* Ajoute de l'espace autour du texte pour une meilleure lisibilité */
-  background-color: #ffffff; /* Fond blanc pour les paragraphes de résumé */
-  border-left: 3px solid #907f9a; /* Ajoute une bordure gauche pour distinguer les paragraphes */
-  width: 100%; /* Assure que le texte prend toute la largeur du conteneur */
-}
 </style>
