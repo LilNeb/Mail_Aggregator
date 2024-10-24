@@ -3,43 +3,53 @@
   <div v-if="show" class="paywall-overlay">
     <div class="paywall-modal">
       <h2>Contenu Premium</h2>
-      <p>Pour accéder à ce contenu, veuillez payer 1 sat</p>
       
-      <div v-if="invoice" class="qr-container">
-        <p>Scannez le QR code ou copiez l'invoice:</p>
-        <div class="invoice-text">{{ invoice.request }}</div>
-        <button @click="copyInvoice">Copier l'invoice</button>
-      </div>
+      <LightningWallet @wallet-ready="walletReady = true" />
+      
+      <div v-if="walletReady">
+        <p>Pour accéder à ce contenu, veuillez payer {{ LNBITS_CONFIG.MIN_SATS }} sat</p>
+        
+        <div v-if="invoice" class="invoice-container">
+          <p>Facture Lightning :</p>
+          <div class="invoice-text">{{ invoice.payment_request }}</div>
+          <button @click="copyInvoice" class="copy-btn">
+            Copier la facture
+          </button>
+        </div>
 
-      <div v-if="error" class="error">{{ error }}</div>
-      
-      <div class="button-container">
-        <button @click="getInvoice" :disabled="loading || invoice">
-          {{ loading ? 'Chargement...' : 'Payer maintenant' }}
-        </button>
-        <button @click="$emit('close')" class="cancel-btn">Annuler</button>
+        <div v-if="error" class="error">{{ error }}</div>
+        
+        <div class="button-container">
+          <button @click="createInvoice" :disabled="loading || invoice" class="pay-btn">
+            {{ loading ? 'Chargement...' : 'Générer la facture' }}
+          </button>
+          <button @click="$emit('close')" class="cancel-btn">
+            Annuler
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-const API_URL = 'http://localhost:3000'; // Ajustez selon votre configuration
+import { LNBITS_CONFIG } from '../config/lightning';
+import LightningWallet from './LightningWallet.vue';
 
 export default {
   name: 'LightningPaywall',
+  components: {
+    LightningWallet
+  },
   props: {
     show: {
       type: Boolean,
       default: false
-    },
-    userId: {
-      type: String,
-      required: true
     }
   },
   data() {
     return {
+      walletReady: false,
       invoice: null,
       loading: false,
       error: null,
@@ -47,24 +57,32 @@ export default {
     }
   },
   methods: {
-    async getInvoice() {
+    async createInvoice() {
       this.loading = true;
       this.error = null;
       
       try {
-        const response = await fetch(`${API_URL}/lightning/invoice`, {
+        const response = await fetch(`${LNBITS_CONFIG.API_URL}/api/v1/payments`, {
+          method: 'POST',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
+            'Content-Type': 'application/json',
+            'X-Api-Key': LNBITS_CONFIG.INVOICE_KEY
+          },
+          body: JSON.stringify({
+            out: false,
+            amount: LNBITS_CONFIG.MIN_SATS,
+            memo: "Accès contenu premium",
+            unit: "sat"
+          })
         });
         
         const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
+        if (!response.ok) throw new Error(data.message);
         
         this.invoice = data;
         this.startCheckingPayment();
       } catch (err) {
-        this.error = "Erreur lors de la création de l'invoice";
+        this.error = "Erreur lors de la création de la facture";
         console.error(err);
       } finally {
         this.loading = false;
@@ -72,12 +90,14 @@ export default {
     },
 
     async checkPayment() {
+      if (!this.invoice) return;
+      
       try {
         const response = await fetch(
-          `${API_URL}/lightning/check-invoice?hash=${this.invoice.hash}`,
+          `${LNBITS_CONFIG.API_URL}/api/v1/payments/${this.invoice.payment_hash}`,
           {
             headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
+              'X-Api-Key': LNBITS_CONFIG.INVOICE_KEY
             }
           }
         );
@@ -89,7 +109,7 @@ export default {
           this.$emit('close');
         }
       } catch (err) {
-        console.error('Erreur lors de la vérification du paiement:', err);
+        console.error('Erreur vérification paiement:', err);
       }
     },
 
@@ -106,7 +126,7 @@ export default {
 
     copyInvoice() {
       if (this.invoice) {
-        navigator.clipboard.writeText(this.invoice.request);
+        navigator.clipboard.writeText(this.invoice.payment_request);
       }
     }
   },
@@ -139,12 +159,17 @@ export default {
   width: 90%;
 }
 
+.invoice-container {
+  margin: 1rem 0;
+}
+
 .invoice-text {
   word-break: break-all;
   background-color: #f5f5f5;
   padding: 1rem;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   border-radius: 4px;
+  font-family: monospace;
 }
 
 .button-container {
@@ -153,21 +178,30 @@ export default {
   margin-top: 1rem;
 }
 
-button {
+.pay-btn, .copy-btn, .cancel-btn {
   padding: 0.5rem 1rem;
   border-radius: 4px;
   border: none;
   cursor: pointer;
-  background-color: #007bff;
+}
+
+.pay-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.copy-btn {
+  background-color: #6c757d;
   color: white;
 }
 
 .cancel-btn {
-  background-color: #6c757d;
+  background-color: #dc3545;
+  color: white;
 }
 
 .error {
-  color: red;
-  margin: 1rem 0;
+  color: #dc3545;
+  margin: 0.5rem 0;
 }
 </style>

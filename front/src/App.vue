@@ -17,17 +17,28 @@
       <div class="welcome-message">
         <h1>Bienvenue sur notre plateforme</h1>
         <p>Pour accéder à tous nos contenus, un paiement unique de 1 sat est requis.</p>
-        <button @click="showPaywall = true" class="pay-button">
+        
+        <!-- Intégration du composant LightningWallet -->
+        <LightningWallet 
+          @wallet-connected="handleWalletConnect"
+          @wallet-disconnected="handleWalletDisconnect"
+        />
+        
+        <LightningPaywall 
+          v-if="walletConnected"
+          :show="showPaywall"
+          @close="showPaywall = false"
+          @payment-success="handlePaymentSuccess"
+        />
+
+        <button 
+          v-if="walletConnected && !showPaywall" 
+          @click="showPaywall = true" 
+          class="pay-button"
+        >
           Accéder au contenu
         </button>
       </div>
-
-      <LightningPaywall 
-        :show="showPaywall"
-        :userId="userId"
-        @close="showPaywall = false"
-        @payment-success="handlePaymentSuccess"
-      />
     </div>
   </div>
 </template>
@@ -35,6 +46,7 @@
 <script>
 import CategoryGrid from './components/CategoryGrid.vue'
 import SummariesContainer from './components/SummariesContainer.vue'
+import LightningWallet from './components/LightningWallet.vue'
 import LightningPaywall from './components/LightningPaywall.vue'
 
 export default {
@@ -42,6 +54,7 @@ export default {
   components: {
     CategoryGrid,
     SummariesContainer,
+    LightningWallet,
     LightningPaywall
   },
   data() {
@@ -49,35 +62,54 @@ export default {
       isLoading: true,
       hasPaid: false,
       showPaywall: false,
-      userId: 'user-123' // À remplacer par votre logique d'identification
+      walletConnected: false
     }
   },
   methods: {
     async checkPaymentStatus() {
       try {
+        const walletId = localStorage.getItem('lightning_wallet_id');
+        if (!walletId) {
+          this.hasPaid = false;
+          return;
+        }
+
         const response = await fetch('http://localhost:3000/lightning/check-payment', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        })
-        const data = await response.json()
-        this.hasPaid = data.paid
+        });
+        const data = await response.json();
+        this.hasPaid = data.paid;
       } catch (error) {
-        console.error('Erreur lors de la vérification du paiement:', error)
-        this.hasPaid = false
+        console.error('Erreur lors de la vérification du paiement:', error);
+        this.hasPaid = false;
       } finally {
-        this.isLoading = false
+        this.isLoading = false;
       }
     },
     
+    handleWalletConnect() {
+      this.walletConnected = true;
+    },
+
+    handleWalletDisconnect() {
+      this.walletConnected = false;
+      this.showPaywall = false;
+    },
+
     async handlePaymentSuccess() {
-      await this.checkPaymentStatus()
-      // Vous pouvez ajouter ici d'autres actions après le paiement réussi
-      console.log('Paiement réussi! Accès débloqué.')
+      await this.checkPaymentStatus();
+      console.log('Paiement réussi! Accès débloqué.');
     }
   },
   async mounted() {
-    await this.checkPaymentStatus()
+    console.log('Variables d\'environnement :', {
+    API_URL: process.env.VUE_APP_LNBITS_API_URL,
+    hasAdminKey: !!process.env.VUE_APP_LNBITS_ADMIN_KEY,
+    hasInvoiceKey: !!process.env.VUE_APP_LNBITS_INVOICE_KEY
+  });
+    await this.checkPaymentStatus();
   }
 }
 </script>
@@ -133,6 +165,7 @@ export default {
   font-size: 1.1rem;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin-top: 1rem;
 }
 
 .pay-button:hover {
