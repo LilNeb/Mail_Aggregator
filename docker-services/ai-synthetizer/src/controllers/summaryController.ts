@@ -55,8 +55,21 @@ export const summarizeCategory = async (req: Request, res: Response) => {
           messages: [
             {
               role: "user",
-              content: `Imagine that you are writing a newletter which concept is to synthesize destined for readers. Do not write anything else than the final synthesized text from the post. You are going to analyse this newsletter about ${category}. Do a synthesis IN ${language}. The reader needs the key information but be explicit, he needs to understand what are the news. Do not write the words "bullet points" or "summary" or any similar context words in the text. Before the summary, write a short title to introduce the summary. Then, write the summary.
-                here is the post: ${fileContent}`,
+              content:  `Imagine that you are writing a newletter which concept is to synthesize destined for readers. You are going to analyse this newsletter about ${category}. Do a synthesis IN ${language} and your answer HAS TO be markdown code. You can deviate from the format only if it's necessary and it corresponds better to the original post. only answer the markdown code. \n
+              \n
+              Here is the format of the answer you're gonna provide:
+              ### [Title you found in the post]
+              \n
+              (please make important information bold and/or italic, try to keep the summary short and concise)
+              - [Important information 1 (~1-2 sentences)]
+              - [Important information 2 (~1-2 sentences)]
+              - [Important information 3 (~1-2 sentences)]
+              - [Last important information (~1-2 sentences)]
+              \n
+              [**Conclusion**, **Summary** or **Final thoughts**, depends on the content of the post]
+
+
+              here is the post: ${fileContent}`,
             },
           ],
         },
