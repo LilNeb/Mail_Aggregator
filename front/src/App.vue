@@ -1,155 +1,146 @@
+// src/App.vue
 <template>
-  <div id="app" class="container">
-    <div class="logo-container">
-      <img src="logo.png" alt="Logo" class="logo" style="width: 50px; height: 50px; margin-right: 10px;" />
-      <h1 class="title">Mail-Aggregator | A PI² project</h1>
+  <div id="app">
+    <!-- Afficher le loader pendant la vérification -->
+    <div v-if="isLoading" class="loading-overlay">
+      <div class="loading-spinner"></div>
     </div>
-    <CategoryGrid
-      v-if="!categorySelected"
-      :categories="categories"
-      :selectedCategories="selectedCategories"
-      @toggle-category="toggleCategory"
-    />
-    <SubmitClearBar
-      v-if="!categorySelected"
-      @clear-categories="clearCategories"
-      @submit-categories="submitCategories"
-    />
-    <StatusMessage :messages="statusMessages" />
-    <SummariesContainer v-if="categorySelected" :summaries="summaries" />
+
+    <!-- Afficher le contenu normal si l'utilisateur a payé -->
+    <div v-else-if="hasPaid">
+      <CategoryGrid />
+      <SummariesContainer />
+    </div>
+
+    <!-- Afficher le paywall si l'utilisateur n'a pas payé -->
+    <div v-else class="paywall-container">
+      <div class="welcome-message">
+        <h1>Bienvenue sur notre plateforme</h1>
+        <p>Pour accéder à tous nos contenus, un paiement unique de 1 sat est requis.</p>
+        <button @click="showPaywall = true" class="pay-button">
+          Accéder au contenu
+        </button>
+      </div>
+
+      <LightningPaywall 
+        :show="showPaywall"
+        :userId="userId"
+        @close="showPaywall = false"
+        @payment-success="handlePaymentSuccess"
+      />
+    </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-import markdownit from 'markdown-it'
-import CategoryGrid from './components/CategoryGrid.vue';
-import SubmitClearBar from './components/SubmitClearBar.vue';
-import StatusMessage from './components/StatusMessage.vue';
-import SummariesContainer from './components/SummariesContainer.vue';
+import CategoryGrid from './components/CategoryGrid.vue'
+import SummariesContainer from './components/SummariesContainer.vue'
+import LightningPaywall from './components/LightningPaywall.vue'
 
 export default {
-  data() {
-    return {
-      categories: {},
-      selectedCategories: [],
-      hover: null,
-      statusMessages: [],
-      summaries: [],
-      categorySelected: false
-    };
-  },
-  created() {
-    this.fetchCategories();
-  },
+  name: 'App',
   components: {
     CategoryGrid,
-    SubmitClearBar,
-    StatusMessage,
-    SummariesContainer
+    SummariesContainer,
+    LightningPaywall
+  },
+  data() {
+    return {
+      isLoading: true,
+      hasPaid: false,
+      showPaywall: false,
+      userId: 'user-123' // À remplacer par votre logique d'identification
+    }
   },
   methods: {
-    async fetchCategories() {
+    async checkPaymentStatus() {
       try {
-        const response = await axios.get("http://localhost:3000/api/categories");
-        this.categories = Object.keys(response.data).sort().reduce((sortedCategories, key) => {
-          sortedCategories[key] = response.data[key];
-          return sortedCategories;
-        }, {});
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    },
-    toggleCategory(category) {
-      const index = this.selectedCategories.indexOf(category);
-      if (index === -1) {
-        this.selectedCategories.push(category);
-      } else {
-        this.selectedCategories.splice(index, 1);
-      }
-    },
-    clearCategories() {
-      this.selectedCategories = [];
-      this.statusMessages = [];
-      this.summaries = [];
-    },
-    async submitCategories() {
-      this.statusMessages = ["Starting submission process..."];
-      let categorySummaries = [];
-      this.categorySelected = true;
-      
-      for (let category of this.selectedCategories) {
-        try {
-          this.statusMessages.push(`$ Fetching newsletter for category: ${category}`);
-          await this.$nextTick();
-          
-          const postResponse = await axios.post(`http://localhost:3000/api/markdown/${category}`);
-          if (postResponse.data === "success!") {
-            this.statusMessages.push(`Success: Newsletter for category: ${category} successfully fetched`);
-            this.statusMessages.push(`$ Generating text for category: ${category}`);
-            await this.$nextTick();
-            
-            const summaryResponse = await axios.get(`http://localhost:3020/api/summarize/${category}/5`);
-            if (summaryResponse.status === 200) {
-              this.statusMessages.push(`Success: Successfully synthesized text for category: ${category}`);
-              categorySummaries.push({
-                category,
-                summaries: summaryResponse.data.summaries.map(s => s.summary)
-              });
-            }
-          } else {
-            this.statusMessages.push(`Error: Failed to fetch newsletter for category: ${category}`);
+        const response = await fetch('http://localhost:3000/lightning/check-payment', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
-        } catch (error) {
-          console.error("Error in submitting category:", error);
-          this.statusMessages.push(`Error: Exception in processing category: ${category}`);
-        }
-        await new Promise(resolve => setTimeout(resolve, 500));
+        })
+        const data = await response.json()
+        this.hasPaid = data.paid
+      } catch (error) {
+        console.error('Erreur lors de la vérification du paiement:', error)
+        this.hasPaid = false
+      } finally {
+        this.isLoading = false
       }
-      
-      this.statusMessages.push("Submission process completed.");
-      await this.$nextTick();
-      
-      setTimeout(() => {
-        this.statusMessages =
-        [];
-        this.summaries = categorySummaries; // Stocke les résumés formatés avec les catégories
-      }, 2000);
     },
-    renderMarkdown(text) {
-      const md = markdownit()
-      console.log(md.render(text));
-      return md.render(text); // Convertissez le Markdown en HTML
-    },
+    
+    async handlePaymentSuccess() {
+      await this.checkPaymentStatus()
+      // Vous pouvez ajouter ici d'autres actions après le paiement réussi
+      console.log('Paiement réussi! Accès débloqué.')
+    }
+  },
+  async mounted() {
+    await this.checkPaymentStatus()
   }
-};
+}
 </script>
 
 <style>
-/* General Styles */
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
-
-body {
-  margin: 0;
-  background-color: #ffffff;
-}
-
-.container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+#app {
+  font-family: Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  font-family: 'Roboto', sans-serif;
+  color: #2c3e50;
 }
 
-/* Title Styles */
-.title {
-  flex: 0 0 10vh;
-  margin: 0;
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.9);
   display: flex;
-  align-items: center;
   justify-content: center;
-  color: #000000;
+  align-items: center;
+  z-index: 1000;
 }
 
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.paywall-container {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.welcome-message {
+  text-align: center;
+  margin: 4rem 0;
+}
+
+.pay-button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.pay-button:hover {
+  background-color: #2980b9;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 </style>
