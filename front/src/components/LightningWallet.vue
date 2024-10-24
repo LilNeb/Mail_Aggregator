@@ -1,4 +1,5 @@
 // src/components/LightningWallet.vue
+
 <template>
   <div class="wallet-container">
     <div v-if="!initialized && !error" class="wallet-status">
@@ -43,7 +44,6 @@ export default {
         const config = createWalletConfig();
         console.log('Configuration créée');
 
-        // Test de connexion au wallet
         const response = await fetch(`${LNBITS_CONFIG.API_URL}${LNBITS_CONFIG.ENDPOINTS.WALLET}`, {
           headers: config.adminHeaders
         });
@@ -63,11 +63,7 @@ export default {
         
       } catch (err) {
         console.error('Erreur détaillée:', err);
-        if (err.message.includes('Configuration du wallet incomplète')) {
-          this.error = 'Configuration du wallet incomplète. Veuillez vérifier vos clés API.';
-        } else {
-          this.error = `Erreur d'initialisation: ${err.message}`;
-        }
+        this.error = `Erreur d'initialisation: ${err.message}`;
         this.$emit('wallet-ready', false);
       }
     },
@@ -78,6 +74,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .wallet-container {

@@ -1,51 +1,43 @@
 // src/components/LightningPaywall.vue
+
 <template>
   <div v-if="show" class="paywall-overlay">
     <div class="paywall-modal">
       <h2>Contenu Premium</h2>
       
-      <LightningWallet @wallet-ready="walletReady = true" />
+      <div v-if="invoice" class="invoice-container">
+        <p>Facture Lightning :</p>
+        <div class="invoice-text">{{ invoice.payment_request }}</div>
+        <button @click="copyInvoice" class="copy-btn">
+          Copier la facture
+        </button>
+      </div>
+
+      <div v-if="error" class="error">{{ error }}</div>
       
-      <div v-if="walletReady">
-        <p>Pour accéder à ce contenu, veuillez payer 1 sat</p>
+      <div class="button-container">
+        <button @click="createInvoice" :disabled="loading || invoice" class="pay-btn">
+          {{ loading ? 'Chargement...' : 'Générer la facture' }}
+        </button>
         
-        <div v-if="invoice" class="invoice-container">
-          <p>Facture Lightning :</p>
-          <div class="invoice-text">{{ invoice.payment_request }}</div>
-          <button @click="copyInvoice" class="copy-btn">
-            Copier la facture
-          </button>
-        </div>
+        <!-- Bouton de simulation en mode développement -->
+        <button 
+          v-if="isDevelopment && invoice"
+          @click="simulatePayment" 
+          class="simulate-btn"
+        >
+          Simuler le paiement
+        </button>
 
-        <div v-if="error" class="error">{{ error }}</div>
-        
-        <div class="button-container">
-          <button @click="createInvoice" :disabled="loading || invoice" class="pay-btn">
-            {{ loading ? 'Chargement...' : 'Générer la facture' }}
-          </button>
-          
-          <!-- Bouton de simulation en mode développement -->
-          <button 
-            v-if="isDevelopment && invoice"
-            @click="simulatePayment" 
-            class="simulate-btn"
-          >
-            Simuler le paiement
-          </button>
-
-          <button @click="$emit('close')" class="cancel-btn">
-            Annuler
-          </button>
-        </div>
+        <button @click="$emit('close')" class="cancel-btn">
+          Annuler
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import LightningWallet from './LightningWallet.vue'
-
-// Configuration en dur pour éviter les erreurs
 const API_CONFIG = {
   API_URL: process.env.VUE_APP_LNBITS_API_URL || 'https://demo.lnbits.com',
   INVOICE_KEY: process.env.VUE_APP_LNBITS_INVOICE_KEY,
@@ -54,9 +46,6 @@ const API_CONFIG = {
 
 export default {
   name: 'LightningPaywall',
-  components: {
-    LightningWallet
-  },
   props: {
     show: {
       type: Boolean,
@@ -65,7 +54,6 @@ export default {
   },
   data() {
     return {
-      walletReady: false,
       invoice: null,
       loading: false,
       error: null,
@@ -115,7 +103,6 @@ export default {
       }
     },
 
-    // Nouvelle méthode pour simuler un paiement
     simulatePayment() {
       console.log('Simulation du paiement...');
       this.stopCheckingPayment();
@@ -127,7 +114,6 @@ export default {
     async checkPayment() {
       if (!this.invoice) return;
       
-      // En mode développement, ne pas vérifier réellement le paiement
       if (this.isDevelopment) return;
       
       try {
