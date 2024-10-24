@@ -7,7 +7,7 @@
       <LightningWallet @wallet-ready="walletReady = true" />
       
       <div v-if="walletReady">
-        <p>Pour accéder à ce contenu, veuillez payer {{ LNBITS_CONFIG.MIN_SATS }} sat</p>
+        <p>Pour accéder à ce contenu, veuillez payer 1 sat</p>
         
         <div v-if="invoice" class="invoice-container">
           <p>Facture Lightning :</p>
@@ -23,6 +23,16 @@
           <button @click="createInvoice" :disabled="loading || invoice" class="pay-btn">
             {{ loading ? 'Chargement...' : 'Générer la facture' }}
           </button>
+          
+          <!-- Bouton de simulation en mode développement -->
+          <button 
+            v-if="isDevelopment && invoice"
+            @click="simulatePayment" 
+            class="simulate-btn"
+          >
+            Simuler le paiement
+          </button>
+
           <button @click="$emit('close')" class="cancel-btn">
             Annuler
           </button>
@@ -33,8 +43,14 @@
 </template>
 
 <script>
-import { LNBITS_CONFIG } from '../config/lightning';
-import LightningWallet from './LightningWallet.vue';
+import LightningWallet from './LightningWallet.vue'
+
+// Configuration en dur pour éviter les erreurs
+const API_CONFIG = {
+  API_URL: process.env.VUE_APP_LNBITS_API_URL || 'https://demo.lnbits.com',
+  INVOICE_KEY: process.env.VUE_APP_LNBITS_INVOICE_KEY,
+  MIN_SATS: 1
+}
 
 export default {
   name: 'LightningPaywall',
@@ -53,7 +69,8 @@ export default {
       invoice: null,
       loading: false,
       error: null,
-      checkInterval: null
+      checkInterval: null,
+      isDevelopment: process.env.NODE_ENV === 'development'
     }
   },
   methods: {
@@ -62,15 +79,24 @@ export default {
       this.error = null;
       
       try {
-        const response = await fetch(`${LNBITS_CONFIG.API_URL}/api/v1/payments`, {
+        // En mode développement, créer une fausse facture
+        if (this.isDevelopment) {
+          this.invoice = {
+            payment_hash: 'test_hash_' + Date.now(),
+            payment_request: 'FACTURE_TEST_' + Date.now(),
+          };
+          return;
+        }
+
+        const response = await fetch(`${API_CONFIG.API_URL}/api/v1/payments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Api-Key': LNBITS_CONFIG.INVOICE_KEY
+            'X-Api-Key': API_CONFIG.INVOICE_KEY
           },
           body: JSON.stringify({
             out: false,
-            amount: LNBITS_CONFIG.MIN_SATS,
+            amount: API_CONFIG.MIN_SATS,
             memo: "Accès contenu premium",
             unit: "sat"
           })
@@ -89,15 +115,27 @@ export default {
       }
     },
 
+    // Nouvelle méthode pour simuler un paiement
+    simulatePayment() {
+      console.log('Simulation du paiement...');
+      this.stopCheckingPayment();
+      localStorage.setItem('has_paid', 'true');
+      this.$emit('payment-success');
+      this.$emit('close');
+    },
+
     async checkPayment() {
       if (!this.invoice) return;
       
+      // En mode développement, ne pas vérifier réellement le paiement
+      if (this.isDevelopment) return;
+      
       try {
         const response = await fetch(
-          `${LNBITS_CONFIG.API_URL}/api/v1/payments/${this.invoice.payment_hash}`,
+          `${API_CONFIG.API_URL}/api/v1/payments/${this.invoice.payment_hash}`,
           {
             headers: {
-              'X-Api-Key': LNBITS_CONFIG.INVOICE_KEY
+              'X-Api-Key': API_CONFIG.INVOICE_KEY
             }
           }
         );
@@ -105,6 +143,7 @@ export default {
         const data = await response.json();
         if (data.paid) {
           this.stopCheckingPayment();
+          localStorage.setItem('has_paid', 'true');
           this.$emit('payment-success');
           this.$emit('close');
         }
@@ -114,7 +153,9 @@ export default {
     },
 
     startCheckingPayment() {
-      this.checkInterval = setInterval(this.checkPayment, 2000);
+      if (!this.isDevelopment) {
+        this.checkInterval = setInterval(this.checkPayment, 2000);
+      }
     },
 
     stopCheckingPayment() {
@@ -136,6 +177,7 @@ export default {
   }
 }
 </script>
+
 
 <style scoped>
 .paywall-overlay {
